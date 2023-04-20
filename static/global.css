@@ -1,0 +1,13 @@
+.dropdown-results {
+    background-color: rgb(223, 223, 223);
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+	list-style: none;
+	overflow-y: auto;
+	width: fit-content;
+	margin-top: 8.5rem;
+	z-index: 1;
+	position: absolute;
+}

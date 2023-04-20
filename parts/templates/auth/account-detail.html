@@ -1,0 +1,14 @@
+{% extends "base.html" %} {% block content %}
+<div class="d-flex m-auto justify-content-center">
+    <form method="POST" class="text-center">
+        {% csrf_token %}
+        {{ form }}
+        <button class="btn btn-secondary m-2">submit</button>
+    </form>
+</div>
+
+
+<script>
+    $('label[for="id_username"]').hide ();
+</script>
+{% endblock %}

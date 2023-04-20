@@ -1,0 +1,205 @@
+{% extends "base.html" %} {% block content %}
+<style>
+.dropdown-results {
+  background-color: rgb(223, 223, 223);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+	list-style: none;
+	overflow-y: auto;
+	width: fit-content;
+  margin-top: .5rem;
+  
+	z-index: 1;
+	position: absolute;
+}
+</style>
+<div class="d-flex flex-column align-items-center m-auto">
+  <div>
+    <form method="GET" id="search-form" class="d-flex flex-column justify-content-center">
+      {% csrf_token %}
+      <div class="d-flex justify-content-evenly">
+        <select class="d-flex m-auto" id="language">
+          <option value="english">english</option>
+          <option value="danish">dansk</option>
+        </select>
+        <a target="_blank" href="{% url 'parts:list-parts' %}" class="btn m-1 border mr-2">show all parts</a>
+        
+      </div>
+      <div class="d-flex">
+        <div>
+          <input class="form-control mt-2" id="searchbar" type="text" placeholder="name or SKU" name="search">
+          <ul id="results" class="list-unstyled dropdown-results"></ul>
+        </div>
+        
+        <span class="btn border m-2" onclick="search(true)">search</span>
+      </div>
+      
+      <hr>
+    </form>
+    
+  </div>
+  <h6>my order</h6>
+  <ul id="order-form" class="list-unstyled text-center card rounded p-3 w-50">
+    {% for part in parts %}
+    <li value="{{ part.part_no }}">
+      {{ part.slug }}
+      <input class="col-sm-1 m-1" type="number" value="{{ part.quantity }}" min="1">
+      <button class="btn btn-sm btn-danger" onclick="deletePart(this)">x</button>
+    </li>
+    {% endfor %}
+    </ul>
+<form method="POST" class="d-none" id="submisson-form">
+<input type="hidden" name="current-order" value="{{ current_order.0.id }}">
+  {% csrf_token %}
+</form>
+
+<div>
+  <button class="m-2 btn btn-secondary" onclick="submitOrder(this)">send</button>
+  <button class="m-2 btn btn-secondary" onclick="submitOrder(this)">save</button>
+</div>
+
+</div>
+<script>
+  
+  document.addEventListener('keydown', function (event) {
+   if (event.key === 'Backspace'){
+    const resultsList = document.getElementById('results')
+    resultsList.innerHTML= ''
+    
+   } else {
+    search(false)
+    const resultsList = document.getElementById('results')
+    resultsList.innerHTML= ''
+   }
+   
+  });
+
+const search = (click) => {
+    const searchbar = document.getElementById('searchbar')
+    const query = searchbar.value
+    const resultsList = document.getElementById('results')
+    if (click){
+      resultsList.innerHTML = ''
+    }
+    const language = document.getElementById('language').value
+    if(query.length > 1){
+    $.ajax({
+    url: '/ajax/',
+    data: {
+        'search': query,
+        'language': language,
+    },
+    dataType: 'json',
+    success: function (data) {
+        
+        data.forEach(element => {
+          console.log('1 = ' +  element.title)
+        const button = document.createElement("button")
+        button.classList.add('btn')
+        if (!document.getElementById(element.title)){
+            console.log('2 = ' + element.title)
+            button.setAttribute('id',element.title)
+            if (element.out_of_stock){
+                button.classList.add('btn-danger')
+                button.classList.add('btn','btn-danger','m-1')
+                button.disabled = true
+                const info = document.createElement('span')
+            } else {
+              button.classList.add('btn','btn-light','m-1')
+            }
+            button.value = element.part_no
+
+            if (click){
+              button.innerHTML = element['title']
+            }
+            else {
+              if (language === 'danish'){
+                button.innerHTML = element['danish_slug']
+              }
+              else {
+                button.innerHTML = element['slug']
+              }
+              
+            }
+            button.onclick = function(e) {
+                const orderForm = document.getElementById('order-form')
+                const li = document.createElement('li')
+                li.innerHTML = this.innerHTML
+                li.value = this.value
+                orderForm.insertBefore(li, orderForm.firstChild)
+                resultsList.innerHTML= ''
+                searchbar.value = ''
+                // quantity
+                const quantity = document.createElement('input')
+                quantity.setAttribute('type','number')
+                quantity.setAttribute('value','0')
+                quantity.classList.add('col-sm-1','m-1')
+                quantity.required = true
+                quantity.min = 1
+                quantity.value = 1
+                li.appendChild(quantity)
+                const deleteButton = document.createElement('button')
+                deleteButton.classList.add('btn','btn-sm','btn-danger','m-2')
+                deleteButton.innerHTML = 'x'
+                deleteButton.onclick = function(e){
+                  this.parentNode.remove()
+                }
+                li.appendChild(deleteButton)
+            }
+            resultsList.appendChild(button)
+        }
+      });
+        }
+    });
+    }
+    
+    
+}
+
+
+const submitOrder = (e) => {
+  const orderForm = document.getElementById('order-form');
+  const order = [];
+  orderForm.childNodes.forEach(element => {
+    print
+    if (element.value) {
+      obj = {
+        'part_no': element.value,
+        'quantity': element.childNodes[1].value
+      }
+      order.push(obj)
+    }
+      
+    }
+  );
+
+  const form = document.getElementById('submisson-form');
+  order.forEach(item => {
+    const input = document.createElement('input');
+    const obj = JSON.stringify(item);
+    input.type = 'text';
+    input.name = 'part'
+    input.value = obj;
+    form.appendChild(input);
+  });
+  console.log(e)
+    if (e.innerHTML === 'save'){
+      const saveInput = document.createElement('input')
+      saveInput.type = 'hidden'
+      saveInput.name = 'save'
+      saveInput.value = 'true'
+      form.appendChild(saveInput)
+    }
+  
+  document.body.appendChild(form);
+  
+  form.submit();
+}
+
+const deletePart = (e) => {
+  e.parentNode.remove()
+}
+</script>
+{%  endblock %}

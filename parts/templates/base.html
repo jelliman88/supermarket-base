@@ -1,0 +1,51 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://bootswatch.com/5/spacelab/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'global.css' %}">
+    <script
+         src="https://code.jquery.com/jquery-3.6.0.min.js"
+         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+         crossorigin="anonymous"></script>
+    <title>supermarket</title>
+</head>
+<body >
+    <nav class="d-flex justify-content-evenly">
+        <h1 style="color:#00a9e0;">SUPERMARKET</h1>
+        {% if user.is_authenticated %}
+        <ul class="list-unstyled d-flex justify-content-center">
+            {% if user.is_superuser %}
+            
+            <li><a href="{% url 'order:orders'%}"><button class="btn m-1">orders</button></a></li>
+            <li><a href="{% url 'order:archive'%}"><button class="btn m-1">archive</button></a></li>
+            <li><a href="{% url 'parts:list-parts'%}"><button class="btn m-1">items</button></a></li>
+            <li><a href="{% url 'parts:add-part'%}"><button class="btn m-1">add item</button></a></li>
+            <!--<li><a href="{% url 'parts:accounts'%}"><button class="btn btn-warning m-1">accounts</button></a></li>-->
+            {% elif 'lead' in user.username %}
+            <li><a href="{% url 'order:orders'%}"><button class="btn m-1">orders</button></a></li>
+            <li><a href="{% url 'order:index'%}"><button class="btn m-1">order</button></a> </li>
+            {% else %}
+            <li><a href="{% url 'order:orders'%}"><button class="btn m-1">my orders</button></a></li>
+            <li><a href="{% url 'order:index'%}"><button class="btn m-1">order</button></a> </li>
+            {% endif %}
+           
+        </ul>
+        <form action="{% url 'parts:logout' %}" method="POST"> 
+            {% csrf_token %}
+              <span>logged in as {{ user.username }}</span>  
+              <button type="submit" class="btn btn-link; text-warning">Logout</button>
+        </form>
+        
+        {% endif %}
+    </nav>
+    <hr>
+    {% block content %}
+    {%  endblock %}
+    
+    
+</body>
+</html>

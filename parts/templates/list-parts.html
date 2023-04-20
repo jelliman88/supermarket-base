@@ -1,0 +1,102 @@
+{% extends "base.html" %} {% block content %} {% load static %}
+
+    <div class="d-flex flex-column align-items-center m-auto">
+        <form method="GET" id="search-form">
+            {% csrf_token %}
+            <div class="d-flex flex-column">
+                <div class="d-flex flex-column">
+                    <div class="d-flex justify-content-evenly">
+                        <div class="border rounded p-2 m-1">
+                            <label for="out-of-stock">out of stock</label>
+                            <input type="checkbox" id="out-of-stock" name="out-of-stock">
+                        </div>
+                        {% if user.is_superuser %}
+                        <div class="border rounded p-2 m-1">
+                            <label for="out-of-stock">inactive</label>
+                            <input type="checkbox" id="inactive" name="inactive">
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="d-flex">
+                    <input id="searchbar" class="form-control" type="text" placeholder="full name or SKU" name="search">
+                    <button class="btn border">search</button>
+                </div>
+                
+            </div>
+            
+        </form>
+
+    </div>
+    <div>
+        <ul id="results" class="d-flex flex-column"></ul>
+    </div>
+    <div class="text-center">
+        {% if page_obj.has_previous %}
+        <a href="?page=1">&laquo; first</a>
+        <a href="?page={{ page_obj.previous_page_number }}">previous</a> {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span> {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a> {% endif %}
+    </div>
+    <div class="d-flex justify-content-center">
+        <table class="table table-bordered table-responsive-lg w-auto align-items-center">
+            <tr scope="row">
+                <th>SKU Number
+                    <p>(click to copy)</p>
+                </th>
+                <th>name</th>
+                <th>bikes</th>
+                {% if user.is_superuser %}
+                <th>edit</th>
+                {% endif %}
+            </tr>
+            </tr>
+            {% for part in page_obj %}
+            {% if part.out_of_stock %}
+            <tr scope="row" style="background-color: rgb(244, 174, 146);">
+            
+            {% elif part.inactive %}
+            <tr scope="row" style="background-color: rgb(105, 105, 105); color: white;">
+            {% else %}
+            <tr scope="row">
+            {% endif %}
+                <td><button class="btn btn-sm text-dark" onclick="copyText(this)">{{ part.part_no }}</button></td>
+                <td>{{ part.title }}</td>
+                <td class="bike_models">{% for bike in part.bike_models %} <span class="border p-1">{{ bike }}</span> 
+                {% endfor %}</td>
+                {% if user.is_superuser %}
+                <td><span class="m-2">
+                    <a href="{% url 'parts:edit-part' part.id %}">edit</a>
+                </span>
+                </td>
+                {% endif %}
+            </tr>
+           
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="text-center">
+        {% if page_obj.has_previous %}
+        <a href="?page=1">&laquo; first</a>
+        <a href="?page={{ page_obj.previous_page_number }}">previous</a> {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span> {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a> {% endif %}
+    </div>
+
+<script>
+    const copyText = (el) => {
+        const text = el.textContent
+        navigator.clipboard.writeText(text);
+        
+    }
+</script>
+{% endblock %}

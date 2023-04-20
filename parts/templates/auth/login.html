@@ -1,0 +1,10 @@
+{% extends "base.html" %} {% block content %}
+<div class="d-flex flex-column align-items-center m-auto">
+    <form method="POST" class="text-center"> 
+        {% csrf_token %}
+           <p>{{ form.username }} </p>
+           <p>{{ form.password }}</p>
+           <button class="btn btn-primary" type="submit">Login</button>  
+      </form>
+</div>
+{% endblock %}

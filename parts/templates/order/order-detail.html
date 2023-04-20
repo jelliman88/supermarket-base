@@ -1,0 +1,79 @@
+{% extends "base.html" %} {% block content %}
+<div class="d-flex flex-column align-items-center m-auto">
+{% for i in order %}
+    <ul class="list-unstyled d-flex flex-column align-items-center m-auto" id="print-list">
+        <div class="p-3 text-center">
+            <li>{{ i.date }}</li>
+            <li class="text-danger h3">{{ user_in_question }}</li>
+        </div>
+        <span class="border border-3 border-primary p-3 text-center mt-3">
+        {% for part in parts %}
+        <li onclick="strikethrough(this)" class="m-3"><span class="h5">{{ part.part_no}}</span> - 
+            <span>{{ part.title }}</span>
+            <span class="h5 bg-primary text-white rounded px-3 py-1">{{ part.quantity }}</span></li>
+        {% endfor %}
+        </ul>
+        <form method="POST">
+            {% csrf_token %}
+            {% if 'lead' in user.username %}
+            <div class="m-3 d-flex flex-column">
+                <div class="m-3">
+                    <label for="urgent">urgent</label>
+                    <input type="checkbox" id="urgent" name="urgent"
+                    {% if urgent %} checked {% endif %}>
+                </div>
+                <button class="btn btn-primary">save</button>
+            </div>
+            {% endif %}
+            <input type="hidden" name="order-pk" value="{{ i.id }}">
+            {% if user.is_superuser %}
+            {% if i.completed == 'pending' %}
+            <input type="hidden" name="status" value="completed">
+            <div>
+                <button class="btn btn-secondary mt-3">complete</button>
+                <span class="btn btn-secondary mt-3" onclick="printOrder()">print</span>  
+            </div>
+            {% elif i.completed == 'completed' %}
+            <input type="hidden" name="status" value="pending">
+            <button class="btn btn-secondary mt-3">pending</button>
+            <input id="archive-input" type="hidden" name="archive">
+            <button class="btn btn-secondary mt-3" onclick="setArchiveValue()">archive</button>
+            {% else %}
+            <input type="hidden" name="status" value="completed">
+            <button class="btn btn-secondary mt-3">completed</button>
+            {% endif %}
+            {% endif %}
+        </form>
+       
+        <input type="hidden" value="{{ part.json_data }}" id="parts-data">
+        {% endfor %}
+         </span>
+    
+
+</div>
+
+
+<script>
+const setArchiveValue = () => {
+    document.getElementById('archive-input').value = 'true'
+}
+const strikethrough = (e) => {
+    if (e.style.textDecoration == 'line-through') 
+        e.style.textDecoration = 'none'
+    else
+        e.style.textDecoration = 'line-through'
+}
+
+const printOrder = () => {
+    const list= document.getElementById("print-list").innerHTML;
+    const a = window.open('', '', 'height=750, width=750');
+    a.document.write('<html>');
+    a.document.write('<body class="text-white" >');
+    a.document.write(list);
+    a.document.write('</body></html>');
+    a.document.close();
+    a.print();
+}
+
+</script>
+{%  endblock %}

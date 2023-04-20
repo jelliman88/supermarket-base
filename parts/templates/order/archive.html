@@ -1,0 +1,69 @@
+{% extends "base.html" %} {% block content %}
+<div class="d-flex flex-column align-items-center">
+    <h3>Archive</h3>
+    <button class="btn border m-1 d-none" onclick="onDelete()">clear archive</button>
+        <div > 
+        <a class="btn btn-secondary"
+            {% if orders.has_previous %} 
+            href="?page={{ orders.previous_page_number }}"
+            {% else %}
+            disabled="true"
+            {% endif %} 
+        >prev</a> 
+        <a class="btn btn-secondary" 
+            {% if orders.has_next %} 
+            href="?page={{ orders.next_page_number }}"
+            {% else %}
+            disabled="true"
+            {% endif %}
+        >next</a> 
+    </div>
+    <form method="POST" class="d-flex flex-column mt-2" id="form">
+            {% csrf_token %}
+           <select type="submit" name="user-filter" >
+                    <option disabled="disabled" selected>select</option>
+                    {% for user in users %}
+                    {% if not user.is_superuser %}
+                    <option value="{{ user }}"
+                    >{{ user }}</option>
+                    {% endif %}
+                    {% endfor %}
+                </select>
+                <button class="btn btn-dark mt-1">filter</button>
+            <div class="h3 text-center">
+                {{ user_filter }}
+            </div>
+        </form>
+    <ul class="list-unstyled p-3 m-3">
+       {% for order in orders %}
+       <li class="d-flex flex-column m-1 text-center border border-2 rounded p-2">
+        {% if user.is_superuser %}
+        <span >{{ order.user }}</span>
+        {% endif %}
+    <a class="btn btn-secondary" href="{% url 'order:order-detail' order.id %}">
+        <span>order #{{ order.id }}</span>
+        <span class="bg-dark p-1 rounded">{{ order.date|date:"d/m/y" }}</span>
+    </a>
+        </li>
+       {% endfor %}
+    </ul>
+</div>
+
+<script>
+const onDelete = () => {
+  const confirmed = confirm("Are you sure you want to clear all orders from the archive?");
+  if (confirmed) {
+    input = document.createElement("input")
+    input.type = "hidden"
+    input.name = "clear-archive"
+    input.value = "true"
+    form = document.getElementById("form")
+    form.appendChild(input)
+    form.submit()
+    
+  } else {
+    return false;
+  }
+}
+</script>
+{%  endblock %}

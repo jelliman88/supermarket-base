@@ -1,0 +1,64 @@
+{% extends "base.html" %} {% block content %}
+<div class="d-flex flex-column align-items-center m-auto">
+    
+    <h3>edit item</h3>
+
+    <p>{{ msg }}</p>
+    <form method="POST" class="text-center" id="form">
+       {% csrf_token %}
+       {{ form.as_p }}
+       <div class="m-3 border rounded p-3">
+        <div>
+            <span class="border rounded p-1"><span class="m-1">D7</span></label><input type="checkbox" name="bikes" value="D7"></span>
+            <span class="border rounded p-1"><span class="m-1">O1+</span></label><input type="checkbox" name="bikes" value="O1+"></span>
+            <span class="border rounded p-1"><span class="m-1">P7</span></label><input type="checkbox" name="bikes" value="P7"></span>
+             <span class="border rounded p-1"><span class="m-1">P1</span></label><input type="checkbox" name="bikes" value="P1"></span>
+        </div>
+       </div>
+       <div class="d-flex justify-content-evenly">
+        <button class="btn btn-success">update</button>
+       
+      </form>
+        <button class="btn btn-danger mt-1" onclick="onDelete()">delete</button>
+      </div>
+</div>
+
+<script>
+// populate checkboxes
+const bikes = document.getElementById('initial-id_bike_models').value
+const bikesArr = eval(bikes)
+const checkboxes = document.getElementsByName('bikes')
+for (let i = 0; i < checkboxes.length; i++) {
+  if (bikesArr.includes(checkboxes[i].value)) {
+    checkboxes[i].checked = true
+  }
+}
+
+
+    const onDelete = () => {
+  const confirmed = confirm("Are you sure you want to delete?");
+  if (confirmed) {
+    const deleteInput = document.createElement("input")
+    deleteInput.setAttribute("type", "hidden")
+    deleteInput.setAttribute("name", "delete")
+    deleteInput.setAttribute("value", "true")
+    const form = document.getElementById("form")
+    form.appendChild(deleteInput)
+    form.submit()
+    
+  } else {
+    return false;
+  }
+}
+
+
+    
+    $('label[for="id_slug"]').hide ()
+    $('label[for="id_danish_slug"]').hide ()
+    $('label[for="id_title"]').hide ()
+    $('label[for="id_part_no"]').hide ()
+    $('label[for="id_bike_models"]').hide ()
+</script>
+
+
+{% endblock %}

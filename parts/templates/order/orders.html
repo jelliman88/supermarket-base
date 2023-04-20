@@ -1,0 +1,97 @@
+{% extends "base.html" %} {% block content %}
+<div class="d-flex justify-content-evenly">
+    {% if not user.is_superuser %}
+    <ul class="list-unstyled border border-3 border p-3 m-3">
+        <h3 class="text-center">my orders</h3>
+        {% for order in orders %}
+        {% if order.current_order %}
+        <li class="m-1">
+            <a class="btn text-white" {% if user.id == order.user_id %} style="background-color:#00a9e0;"  href="{% url 'order:index' %}">current order 
+            {% else %}
+            style="background-color:#884acf;" href="{% url 'order:order-detail' order.id %}">current store order 
+            {% endif %}
+         </a>
+        </li>
+        {% else %}
+        <li class="m-1">
+            <a 
+            {% if order.completed == 'pending' %}
+            class="btn btn-danger"
+            {% else %}
+            class="btn btn-success"
+            {% endif %}href="{% url 'order:order-detail' order.id %}">order #{{ order.id }}
+                <span>{{ order.date }}</span>
+            </a>
+            {% if order.urgent %}
+            <span class="btn btn-success">URGENT</span>
+            {% endif %}
+            </li>
+        {% endif %}
+        {% endfor %}
+    </ul>
+    {% else %}
+<ul class="list-unstyled p-3 m-3">
+    <h3 class="text-center">pending</h3>
+    {% for order in orders %}
+    
+    {% if order.completed == 'pending' %}
+    
+    <li class="d-flex flex-column m-1 text-center border border-2 {% if order.urgent %} border-success {% endif %} rounded p-2">
+        
+        {% if user.is_superuser %}
+        <div class="m-1">
+            <span>{{ order.user }}</span>
+            <span class="border border-2 rounded text-white" style="padding: 1px; background: #00a9e0;">{{ order.date|date:"jS" }}</span>
+        </div>
+        {% if order.urgent %}
+        <span class="btn btn-success m-1">URGENT</span>
+        {% endif %}
+        {% endif %}
+    <a class="btn btn-danger" href="{% url 'order:order-detail' order.id %}">
+        <span>order #{{ order.id }}</span></a>
+    </li>
+        {% endif %}
+        
+        {% endfor %} 
+</ul>
+<form method="POST" class="d-flex flex-column position-fixed">
+    {% csrf_token %}
+   <select type="submit" name="user-filter" id="filter-form">
+            <option disabled="disabled" selected>select</option>
+            {% for user in users %}
+            {% if not user.is_superuser %}
+            <option value="{{ user }}"
+            >{{ user }}</option>
+            {% endif %}
+            {% endfor %}
+        </select>
+        <button class="btn btn-dark mt-1">filter</button>
+    <div class="h3 text-center">
+        {{ user_filter }}
+    </div>
+</form>
+<ul class="list-unstyled p-3 m-3">
+    <h3 class="text-center">completed</h3>
+    {% for order in orders %}
+    {% if order.completed == 'completed' %}
+    <li class="d-flex flex-column m-1 text-center border border-2 rounded p-2">
+        {% if user.is_superuser %}
+        <div class="m-1">
+            <span>{{ order.user }}</span>
+            <span class="border border-2 rounded text-white" style="padding: 1px; background: lightgray;">{{ order.date|date:"jS" }}</span>
+        </div>
+       
+        {% endif %}
+    <a class="btn btn-success" href="{% url 'order:order-detail' order.id %}">
+        <span>order #{{ order.id }}</span>
+    </a>
+        </li>
+        {% endif %}
+        {% endfor %}
+    
+</ul>
+    
+</div>
+{% endif %}
+
+{%  endblock %}

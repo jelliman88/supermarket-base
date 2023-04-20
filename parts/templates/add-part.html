@@ -1,0 +1,31 @@
+{% extends "base.html" %} {% block content %}
+<div class="d-flex flex-column align-items-center m-auto">
+    
+    <h3>add item</h3>
+
+    {% if msg == 'part added' %}<p class="alert alert-success" role="alert">{{ msg }}</p>  {% endif %}
+    <form method="POST" class="text-center">
+       {% csrf_token %}
+       {{ form.as_p }}
+       <div class="m-3 border rounded p-3">
+        <div>
+            <span class="border rounded p-1"><span class="m-1">D7</span></label><input type="checkbox" name="bikes" value="D7"></span>
+            <span class="border rounded p-1"><span class="m-1">O1+</span></label><input type="checkbox" name="bikes" value="O1+"></span>
+            <span class="border rounded p-1"><span class="m-1">P7</span></label><input type="checkbox" name="bikes" value="P7"></span>
+             <span class="border rounded p-1"><span class="m-1">P1</span></label><input type="checkbox" name="bikes" value="P1"></span>
+        </div>
+       </div>
+       <button class="btn btn-success">submit</button>
+      </form>
+</div>
+
+<script>
+    $('label[for="id_slug"]').hide ()
+    $('label[for="id_danish_slug"]').hide ()
+    $('label[for="id_title"]').hide ()
+    $('label[for="id_part_no"]').hide ()
+    $('label[for="id_bike_models"]').hide ()
+</script>
+
+
+{% endblock %}
