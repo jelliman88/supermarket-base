@@ -15,16 +15,25 @@
 </head>
 <body >
     <nav class="d-flex justify-content-evenly">
-        <h1 style="color:#00a9e0;">SUPERMARKET</h1>
+        <div class="d-flex">
+            <h1 style="color:#00a9e0;">SUPERMARKET</h1>
+            <img src="{% static 'images/odense.jpg' %}" class="city-logo">
+        </div>
         {% if user.is_authenticated %}
         <ul class="list-unstyled d-flex justify-content-center">
             {% if user.is_superuser %}
-            
+            {% if user.name == 'manager' %}
+            <li><a href="{% url 'order:orders'%}"><button class="btn m-1">orders</button></a></li>
+            <li><a href="{% url 'order:archive'%}"><button class="btn m-1">archive</button></a></li>
+            <li><a href="https://supermarket.eu.pythonanywhere.com/"><button class="btn m-1">copenhagen</button></a></li>
+            <li><a href="{% url 'parts:accounts'%}"><button class="btn m-1">accounts</button></a></li>
+            {% else %}
             <li><a href="{% url 'order:orders'%}"><button class="btn m-1">orders</button></a></li>
             <li><a href="{% url 'order:archive'%}"><button class="btn m-1">archive</button></a></li>
             <li><a href="{% url 'parts:list-parts'%}"><button class="btn m-1">items</button></a></li>
             <li><a href="{% url 'parts:add-part'%}"><button class="btn m-1">add item</button></a></li>
             <!--<li><a href="{% url 'parts:accounts'%}"><button class="btn btn-warning m-1">accounts</button></a></li>-->
+            {% endif %}
             {% elif 'lead' in user.username %}
             <li><a href="{% url 'order:orders'%}"><button class="btn m-1">orders</button></a></li>
             <li><a href="{% url 'order:index'%}"><button class="btn m-1">order</button></a> </li>

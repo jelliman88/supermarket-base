@@ -1,2 +1,12 @@
 
 
+.city-logo {
+    width: 8rem;
+    height: 3rem;
+    margin-top: .4rem;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    display: inline-block;
+    vertical-align: middle;
+}
